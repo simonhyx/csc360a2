@@ -26,17 +26,6 @@ int mode;
 
 
 
-
-
-
-typedef struct dynamic_array_struct
-{
-  resource_t* data;
-  int capacity; /* total capacity */
-  int* size; /* number of elements in vector */
-} vector;
-
-vector* v ;
 resource_t* ar;
 int cap;
 
@@ -74,26 +63,6 @@ void *emalloc(size_t n){
 
 
 
-int vector_init(vector* s, int init_capacity)
-{
-//
-//printf("init capacity = %d",init_capacity);
-//exit(1);
-  
-	ar = (resource_t*)erealloc(NULL, sizeof(resource_t*)*init_capacity);
-	cap = init_capacity;
-	//s->data = temp1;
-//exit(1);
-  //if (!s->data) return -1;
-
-  //s->size = 0;
-//exit(1);
- // s->capacity = init_capacity;
-
-  return 0; /* success */
-}
-
-
 
 //recource_t * resource;
 
@@ -107,17 +76,13 @@ void initialize_meetup(int n, int mf) {
         exit(1);
     }
 
-//exit(1);
-    /*
-     * Initialize the shared structures, including those used for
-     * synchronization.
-     */
-	//pthread_cond_init();
-	vector* w;
-	 i = vector_init(w, 10);
-	//init_resource(resource, char *);
-	pthread_mutex_init(&key, NULL);
 
+        ar = (resource_t*)erealloc(NULL, sizeof(resource_t*)*10);
+        cap = 10;
+
+
+	pthread_mutex_init(&key, NULL);
+	int ret = pthread_cond_init(&m,NULL);
 	SizeofHips = n;
 	if (mf == 0){
 		mode =0;
@@ -133,11 +98,11 @@ void initialize_meetup(int n, int mf) {
 
 
 void join_meetup(char *value, int len) {
-   printf("NOTHING IMPLEMENTED YET FOR join_meetup\n");
-	printf("at line 136 count = %d\n mode = %d",count, mode);
+ //  printf("NOTHING IMPLEMENTED YET FOR join_meetup\n");
+	printf("\nat line 136 count = %d\n mode = %d",count, mode);
 	pthread_mutex_lock(&key);
 	count = count +1;
-	printf("at line 138 count = %d\n mode = %d", count, mode);
+	printf("\nat line 138 count = %d\n mode = %d", count, mode);
 	if (count < SizeofHips){
 		int mygen = generation;
 		while(mygen == generation){
@@ -145,14 +110,16 @@ void join_meetup(char *value, int len) {
 		}
 		resource_t* word = ar;
 		word = word + mygen;
-exit(1);
+//xit(1);
 		if (mode == 1 && count == 1){ // if in meet first mode store the code word for the first person
 			// check if the generation number is greater than the size of the vector 
 			// if yes, re-size
+
 			if (mygen + 1 > cap){
 				int k = 2 * cap;
 				ar = realloc(ar,k * sizeof(resource_t));
 			}  // resize complete, then must check if realloc is successful. 
+printf("\non line 157 writing value = %s\n", value);
 			write_resource(word, value, strlen(value));
 		}
 		// read word
@@ -179,9 +146,12 @@ exit(1);
 				int k = 2 * cap;
 				ar = realloc(ar,k * sizeof(resource_t));
 			}  // resize complete, then must check if realloc is successful. 
+			printf("\nLine 184 writing value = %s\n",value);
 			write_resource(word, value, strlen(value));
+			
 		}
 		char * temp = word-> value;
+printf("on line 185 temp = %s\n, value = %s\n",temp ,value);
 		read_resource(word, value,strlen(temp));
 		if (word->num_reads == SizeofHips){ // once the final read is issued free the variable
 			//free(word);
