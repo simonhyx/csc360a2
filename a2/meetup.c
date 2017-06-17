@@ -105,9 +105,6 @@ void join_meetup(char *value, int len) {
 	printf("\nat line 138 count = %d\n mode = %d", count, mode);
 	if (count < SizeofHips){
 		int mygen = generation;
-		while(mygen == generation){
-			pthread_cond_wait(&m, &key);
-		}
 		resource_t* word = ar;
 		word = word + mygen;
 //xit(1);
@@ -122,6 +119,15 @@ void join_meetup(char *value, int len) {
 printf("\non line 157 writing value = %s\n", value);
 			write_resource(word, value, strlen(value));
 		}
+
+
+
+
+
+		while(mygen == generation){
+			pthread_cond_wait(&m, &key);
+		}
+
 		// read word
 		// for both meet first and meet last ?
 		// read the word corresponding to your generation only
